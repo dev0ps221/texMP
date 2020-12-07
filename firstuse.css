@@ -1,0 +1,11 @@
+#firstuse{
+    margin:2%;
+    width: auto;
+    height: auto;
+    font-family: robotto;
+    font-weight: bolder;
+    font-size: 26px;
+}
+#firstuse h1{
+    color: white;
+}

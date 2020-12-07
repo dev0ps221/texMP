@@ -1,0 +1,1 @@
+{"name":"ventes","rows":[],"fields":[{"name":"name","options":["text"]},{"name":"unite_mesure","options":["text"]},{"name":"prix","options":["number"]},{"name":"quantite","options":["number"]},{"name":"date","options":["date"]}]}

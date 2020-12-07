@@ -1,0 +1,29 @@
+.cf-form{
+    display: block;
+    margin: 20%;
+    width: 96%;
+    height:90%;
+    margin-top: 5%;
+    margin-bottom: 5%;
+    padding: 0;
+}
+.cf-form .cf-form-field-container{
+    display: block;
+    width:76%;
+    padding: 2%;
+    text-align: justify;
+}
+.cf-form .cf-form-field-container .cf-form-label{
+    display: inline-table;
+    width: 20%;
+}
+.cf-form .cf-form-field-container .cf-form-field{
+    display: inline-table;
+    width: 60%;
+}
+.cf-form .cf-form-field-container .cf-form-submit{
+    display: block;
+    margin-left: 40%;
+    margin-right: 40%;
+    width: 20%;
+}

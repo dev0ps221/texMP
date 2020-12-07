@@ -1,0 +1,5 @@
+create table tables
+create articles designation text,unite_mesure number,prix_par_unite number 
+insert INTO articles name cuillere,unite_mesure unite,prix_par_unite 300
+show FROM articles name cuillere
+update articles name spoon WHERE name cuillere

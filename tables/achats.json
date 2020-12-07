@@ -1,0 +1,1 @@
+{"name":"achats","rows":[[{"name":"cuisiniere"},{"unite_mesure":"unite"},{"prix_par_unite":"125000"},{"quantite":"1"},{"date":"Tue"}]],"fields":[{"name":"name","options":["text"]},{"name":"unite_mesure","options":["text"]},{"name":"prix_par_unite","options":["number"]},{"name":"quantite","options":["number"]},{"name":"date","options":["date"]}]}

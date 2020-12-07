@@ -1,0 +1,1 @@
+{"name":"articles","rows":[[{"name":"cuisiniere"},{"unite_mesure":"unite"},{"prix_par_unite":"125000"}]],"fields":[{"name":"designation","options":["text"]},{"name":"unite_mesure","options":["number"]},{"name":"prix_par_unite","options":["number",""]}]}

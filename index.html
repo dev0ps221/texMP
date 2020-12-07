@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tex Media Player - Tek-Tech 2020</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href='scripts/cp.css'/>
+    <script src='scripts/cp.js'>
+    </script>
+    <link rel="stylesheet" href='scripts/cf.css'/>
+    <script src='scripts/cf.js'>
+    </script>
+</head>
+<body>
+    <section id='main'>
+        <span id='globos'>
+        </span>
+        <div id='media_view'>
+            <div id='media_view_select'>
+                <span class="view_label" id='artists'>
+                    artists
+                </span>
+                <span class="view_label actual_view" id='audio'>
+                    songs
+                </span>
+                <span class="view_label" id='video'>
+                    videos
+                </span>
+                <span class="view_label" id='playlists'>
+                    playlists
+                </span>
+            </div>
+            <div id='media_view_playing'>
+                <h3 id='now_playing_label'>
+                    Now Playing..
+                </h3>
+            </div>
+            <div id='media_view_infos'>
+            </div>
+        </div>
+        <div id='play_view'>
+            <div id='player_view'>
+                <video id='video_player'>
+                </video>                
+            </div>
+            <div id='play_box'>
+                <div id='play_infos'>
+                    <div id='progress_block'>
+                        <div id='progress'>
+                        </div>
+                    </div>
+                    <!-- <marquee behavior='alternate' id="media_name">
+                        No Song Playing...
+                    </marquee> -->
+                    <div id="media_name">
+                        No Song Playing...
+                    </div>
+                </div>
+                <div id='play_controls'>
+                    <span id='volume_box'>
+                    </span>
+                    <span class='control_box' id="play_control">
+                        <img src='assets/icons/play11.png' id='play'/>
+                    </span>
+                    <span class='control_box' id="pause_control">
+                        <img src='assets/icons/pause.png' id='pause'/>
+                    </span>
+                    <span class='little control_box' id="stop_control">
+                        <img src='assets/icons/stop.png' id='stop'/>
+                    </span>
+                    <span class='little control_box' id="repeat_control">
+                        <img src='assets/icons/repeat.png' id='repeat'/>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <span id='refresh_box'>
+            <img src='assets/icons/refresh.png' id='refresh'/>
+        </span>
+    </section>
+    <script src='menu.js'>
+    </script>
+    <script src='texmp.js'>
+    </script>
+</body>
+</html>

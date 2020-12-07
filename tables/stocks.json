@@ -1,0 +1,1 @@
+{"name":"stocks","rows":[[{"designation":"cuisiniere"},{"unite_mesure":"unite"},{"quantite":"1"}]],"fields":[{"name":"designation","options":["text"]},{"name":"unite_mesure","options":["number"]},{"name":"quantite","options":["number",""]}]}
