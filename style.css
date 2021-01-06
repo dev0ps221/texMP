@@ -20,6 +20,7 @@
 body{
     /* background: white;     */
     user-select: none;
+
     /* background: url("./assets/bg55.jpg"); */
     /* background: url("./assets/bg5.jpg"); */
     /* background: url("./assets/bg30.jpg"); */
@@ -179,8 +180,8 @@ h1 {
     border-bottom: 1px solid rgba(0,0,0,0.4);
 }
 #player_view #video_player{
+    /* background: url('assets/tek_tech.jpg'); */
     background: black;
-    background: url('assets/tek_tech.jpg');
     display: block;
     z-index: -1;
     width: 100%;
@@ -205,14 +206,16 @@ h1 {
 #play_infos #progress_block{
     display: block;
     width: 100%;
-    background: purple;
+    background: rgba(0,0,0,0.6);
+    opacity: 0.4;
 }
 #play_infos #progress_block #progress{
     display: block;
     width: 100%;
     background: plum;
-    padding-top: 1%;
-    padding-bottom: 1%;
+    padding-top: 0.5%;
+    padding-bottom: 0.5%;
+    border-radius: 10%;
 }
 #play_infos #song_name{
     position: absolute;

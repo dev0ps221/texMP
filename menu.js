@@ -43,6 +43,13 @@ window.globos = {
                         tab_elem.className = 'globos_menu_tab'
                         tab_elem.innerText = tab.name
                         elem_menu.appendChild(tab_elem)
+                        switch(tab.name){
+                            case "open":
+                                tab_elem.addEventListener('click',e=>document.querySelector(`#${tab.name}`).click(),false)
+                                break
+                            default:
+                                break
+                        }
                     }
                 )
                 window.globos.menu.state = 'visible'

@@ -1,53 +1,55 @@
 {
-  "name": "texmp",
-  "version": "1.0.0",
-  "description": "Le Meilleur lecteur multimedia en provenance du senegal",
-  "main": "./main.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx electron . --no-sandbox",
-    "build_win": "npx electron-builder --win",
-    "build_lin": "npx electron-builder -l"
-  },
-  "build": {
-    "appId": "com.tek-tech.texmp",
-    "productName": "TeX Media Player",
-    "win": {
-      "files": [
-        "./*",
-        "./*/*",
-        "./*/*/*"
-      ],
-      "icon": "./assets/logo.png",
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64",
-            "ia32",
-            "i386"
-          ]
-        }
-      ]
-    }
-  },
-  "author": "El Hadji Seybatou Mbengue (x)",
-  "license": "ISC",
-  "dependencies": {
-    "electron": "^11.0.2",
-    "electron-osx-prompt": "^1.4.1",
-    "ffmetadata": "^1.6.0",
-    "jQuery": "^1.7.4",
-    "media-metadata": "^2.1.0",
-    "node-ffprobe": "^3.0.0",
-    "npm": "^6.14.8"
-  },
-  "devDependencies": {},
-  "keywords": [
-    "media",
-    "player",
-    "video",
-    "mp3",
-    "audio"
-  ]
-}
+    "name": "texmp",
+    "version": "1.0.0",
+    "description": "Le Meilleur lecteur multimedia en provenance du senegal",
+    "main": "main.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "start": "npx electron . --no-sandbox",
+      "build_win": "npx electron-builder --win",
+      "build_lin": "npx electron-builder -l"
+    },
+    "build": {
+      "appId": "com.tek-tech.texmp",
+      "productName": "TeX Media Player",
+      "win": {
+        "files": [
+          "./main.js",
+          "./functions.js",
+          "./scripts/*",
+          "./__conf.texconf",
+          "./__user_pattern.texconf"
+        ],
+        "icon": "./assets/logo.png",
+        "target": [
+          {
+            "target": "nsis",
+            "arch": [
+              "x64",
+              "ia32",
+              "arm64"
+            ]
+          }
+        ]
+      }
+    },
+    "author": "El Hadji Seybatou Mbengue (x)",
+    "license": "ISC",
+    "dependencies": {
+      "electron-osx-prompt": "^1.4.1",
+      "ffmetadata": "^1.6.0",
+      "jQuery": "^1.7.4",
+      "media-metadata": "^2.1.0",
+      "node-ffprobe": "^3.0.0",
+      "npm": "^6.14.8"
+    },
+    "devDependencies": {},
+    "keywords": [
+      "media",
+      "player",
+      "video",
+      "mp3",
+      "audio"
+    ]
+  }
+  

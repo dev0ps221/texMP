@@ -15,9 +15,15 @@ let
     ,now_playing = []
     ,n_playing = 0
     ,unique_loop = false
-
+    ,streamArray
+    ,open = document.createElement('input')
+open.id = 'open'
+open.accept = "audio/*;video/*"
+open.type = "file"
+open.style.display = 'none'
 audio.loop = unique_loop
 audio.volume = video.volume = 0.5
+document.body.appendChild(open)
 video.addEventListener(
     'timeupdate',
     (e)=>{
@@ -81,7 +87,80 @@ audio.addEventListener(
     },false
 )
 const
-    addToNowPlaying=(n)=>{
+    listenArrow = e=>{
+        processVol(0,e.key === 'ArrowDown'?audio.volume*10-1:e.key === 'ArrowUp'?audio.volume*10+1:audio.volume*10)
+        if (actuallyPlayingData)
+            if(e.key === 'ArrowLeft' || e.key === 'ArrowRight' ){
+                let
+                    position = (progress_block.getBoundingClientRect().width/100) * 2 * (e.key === 'ArrowRight'?1:-1)
+                while (audio.currentTime + position < 0){
+                    position = position + 5
+                }
+                while (audio.currentTime + position > actuallyPlayingData.format.duration){
+                    position = position - 5
+                }
+                actuallyPlayingData.format.filename.match('mp3')!==null ? audio.currentTime = audio.currentTime + position : video.currentTime = video.currentTime + position
+                position = 0
+            }
+    }
+    ,listenLetter = e => {
+        (e.key.toLocaleLowerCase().match('[a-z]')!==null) ? jumpToThatLetter(e.key) : pass
+        e.preventDefault()
+    }
+    ,switchListeners=(zone)=>{
+        switch(zone){
+            case "media_view":
+                document.removeEventListener(
+                    'keydown',
+                    listenArrow,
+                    false
+                )
+                document.addEventListener(
+                    'keydown',
+                    listenLetter,
+                    false
+                )
+                break
+            case "play_view":
+                document.removeEventListener(
+                    'keydown',
+                    listenLetter,
+                    false
+                )
+                document.addEventListener(
+                    'keydown',
+                    listenArrow,
+                    false
+                )
+                break
+            default:
+                console.log("How the heck did you come so far \ntexMP is :thinking: ...")
+                break
+        }
+    }
+    ,jumpToThatLetter = (l)=>{
+        let 
+            jumper = document.createElement('a')
+        jumper.href="#that_letter"
+        jumper.id ='jumper'
+        jumper.style.display='none'
+        document.body.appendChild(jumper)
+        if(document.querySelector("#that_letter")) document.querySelector("#that_letter").id = ""
+        document.querySelectorAll('#media_view_infos .media').forEach(
+            media=>{
+                if (media.innerText[0].toLocaleLowerCase() == l.toLocaleLowerCase()){
+                    media.id = "that_letter"
+                    return
+                } 
+            }
+        )
+        if (document.querySelector("#that_letter")){
+            document.querySelector("#jumper").click()
+            document.querySelector("#jumper").parentNode.removeChild(document.querySelector("#jumper"))
+            document.querySelector("#that_letter").id = ""
+        }
+    }
+    ,addToNowPlaying=(n)=>{
         now_playing.push(n)
         let
             label_nowPlaying = playing.firstElementChild
@@ -105,7 +184,6 @@ const
             let volOption = document.createElement('span')
             volOption.className = 'volume_control' 
             volOption.className+= (parseInt(audio.volume*10)===i ? ' actual_vol' : (parseInt(audio.volume*10) > (i)) ? ' contained_vol' : '')
-            console.log(volOption.className)
             volOption.id = i
             volOption.addEventListener(
                 'click',
@@ -169,8 +247,6 @@ const
                         }
                     )    
                 }
-                
-                console.log(now_playing)
             default:
             break
         }
@@ -216,7 +292,6 @@ const
         contextmenu.style.left= '30%'
         contextmenu.style.top = `${e.clientY-5}px`
         document.body.appendChild(contextmenu)
-        console.log(contextmenu.style.left,contextmenu.style.top)
     }
     ,playSingle = (d,n,fn,infos)=>{
         actuallyPlayingData = infos
@@ -233,11 +308,18 @@ const
             actuallyPlayingType = 'video'
             video.setAttribute("src", blobUrl);
             video.play ? video.play() : false
+            // if(video.parentNode.requestFullscreen) video.parentNode.requestFullscreen()
+            // .then(r=>console.log('fullscreen results : ',r))
+            // .catch(e=>console.log('fullscreen error : ',e))
+            video.controls = 1
+            document.querySelector('#play_controls').style.display = 'none'
             audio.pause()
             audio.currentTime = 0;
             audio.src = ''
             return video
         }else{
+            video.controls = 0
+            document.querySelector('#play_controls').style.display = 'inline-table'
             $('#media_name')[0].innerText = n
             actuallyPlayingType = 'audio'
             audio.setAttribute("src", blobUrl);
@@ -270,6 +352,18 @@ const
     ,hideMenu = (e) => {
 
     }
+    ,openMedia = (e)=>{
+        if(e.target.files.length){
+            let {name,size,type,path} = e.target.files[0]
+            ipcRenderer.send(
+                'play opened media'
+                ,{
+                    name,
+                    media :  path
+                }
+            )
+        }
+    }
 ipcRenderer.send(
     'get medias data',
     {}
@@ -284,7 +378,7 @@ ipcRenderer.on(
             folderLabel.className = 'media_folder'
             folderLabel.innerText = folder 
             medias[folder].length ? $('#media_view_infos')[0].appendChild(folderLabel) : folderLabel = undefined
-            
+            medias[folder].sort()
             medias[folder].forEach(
                 media=>{
                     let 
@@ -416,6 +510,56 @@ ipcRenderer.on(
         playSingle(data,name,fn,infos)
     }
 )
+ipcRenderer.on(
+    'lmedia stream reception start'
+    ,(s,size)=>{
+        streamArray = new Uint8Array(size)
+    }
+    ,false
+)
+ipcRenderer.on(
+    'lmedia stream reception',
+    (s,data)=>{
+        for (var i = 0; i < data.length;i++) streamArray[i] = data[i]
+    }
+)
+ipcRenderer.on(
+    'lmedia stream reception end',
+    (s,{data,name,fn,infos})=>{
+
+        let 
+            blob = new Blob([streamArray], { type: "text/plain;charset=utf-8" })
+            ,blobUrl = URL.createObjectURL(blob)    
+            ,n = name
+
+        actuallyPlayingData = infos
+
+        if(now_playing[now_playing.length-1] !== n)
+            addToNowPlaying(n)
+        if (n.match(/.mp3/) === null){
+            $('#media_name')[0].innerText = n
+            actuallyPlayingType = 'video'
+            video.setAttribute("src", blobUrl);
+            video.play ? video.play() : false
+            audio.pause()
+            audio.currentTime = 0;
+            audio.src = ''
+            return video
+        }else{
+            $('#media_name')[0].innerText = n
+            actuallyPlayingType = 'audio'
+            audio.setAttribute("src", blobUrl);
+            audio.play()
+            video.pause ? video.pause() : false
+            video.currentTime = 0;
+            video.innerText = ""
+            ipcRenderer.send(
+                'get metadata',fn
+            )
+            return audio
+        }
+    }
+)
 document.querySelectorAll('.view_label').forEach(
     tab=>{
         tab.addEventListener(
@@ -457,23 +601,84 @@ if(initVolBox()){
 }
 document.addEventListener(
     'keydown',
-    e=>{
-        processVol(0,e.key === 'ArrowDown'?audio.volume*10-1:e.key === 'ArrowUp'?audio.volume*10+1:audio.volume*10)
-
-        if (actuallyPlayingData)
-            if(e.key === 'ArrowLeft' || e.key === 'ArrowRight' ){
-                let
-                    position = (progress_block.getBoundingClientRect().width/100) * 2 * (e.key === 'ArrowRight'?1:-1)
-                while (audio.currentTime + position < 0){
-                    position = position + 5
+    listenArrow
+    ,false
+)
+document.addEventListener(
+    'fullscreenchange'
+    ,e=>{
+        if(document.fullscreenElement){
+            let 
+                exit = document.createElement('span')
+            exit.id = 'fullscreen_exit'
+            exit.innerText = "X"
+            exit.style.position = 'absolute'
+            exit.style.top = "2%"
+            exit.style.left = "2%"
+            exit.style.zIndex = 100
+            document.fullscreenElement.parentNode.appendChild(exit)
+            exit.addEventListener(
+                'click'
+                ,e=>{
+                    document.exitFullscreen()
+                    .then(()=>{console.log('exited fullscreen niceyly ;)')})
+                    .catch(e=>console.log('exiting fullscreen error : ',e))
+                    e.target.parentNode.removeChild(e.target)
                 }
-                while (audio.currentTime + position > actuallyPlayingData.format.duration){
-                    position = position - 5
-                }
-                actuallyPlayingData.format.filename.match('mp3')!==null ? audio.currentTime = audio.currentTime + position : video.currentTime = video.currentTime + position
-                position = 0
-            }
-        
+                ,false
+            )
+            video.parentNode.style.maxHeight = '100%'
+            video.parentNode.style.height = '100%'
+            video.style.position = 'absolute'
+            video.style.top = 0
+            video.style.left = 0
+            video.style.backgroundSize = `${video.parentNode.width} ${video.parentNode.height}`
+        }else{
+            alert('way')
+            // video.controls = 0
+            video.parentNode.style.maxHeight = '80%'
+            video.parentNode.style.height = '80%'
+            video.style.position = 'relative'
+            video.style.backgroundSize = 'cover'
+            video.style.top = 'auto'
+            video.style.left = 'auto'
+        }
     }
     ,false
 )
+document.querySelector("#media_view").addEventListener(
+    "mouseover"
+    ,e=>{
+        switchListeners("media_view")
+    }
+    ,false
+)
+document.querySelector("#play_view").addEventListener(
+    "mouseover"
+    ,e=>{
+        switchListeners("play_view")
+    }
+    ,false
+)
+open.addEventListener(
+    'change'
+    ,openMedia
+    ,false
+)   
+
+// video.addEventListener(
+//     'click'
+//     ,e=>{
+//         if(document.fullscreenElement){
+//             document.exitFullscreen()
+//             .then(()=>{console.log('exited fullscreen niceyly ;)')})
+//             .catch(e=>console.log('exiting fullscreen error : ',e))
+//             document.querySelector('#fullscreen_exit').parentNode.removeChild(document.querySelector('#fullscreen_exit'))
+//         }else{
+//             video.parentNode.requestFullscreen()
+//             .then(r=>console.log('fullscreen results : ',r))
+//             .catch(e=>console.log('fullscreen error : ',e))
+//         }
+//     }
+//     ,false
+// )

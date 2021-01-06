@@ -1,11 +1,12 @@
+console.log(process.mainModule.path)
 let 
     ffprobe = require('node-ffprobe')
-    ,funcs = require('./functions')
+    ,funcs = require(`${process.mainModule.path}/functions`)
     ,os = require('os')
     ,path = require('path')
     ,fs = require('fs')
-    ,confDir = '__conf.texconf'
-    ,userPatDir = '__user_pattern.texconf'
+    ,confDir = `${process.mainModule.path}/__conf.texconf`
+    ,userPatDir = `${process.mainModule.path}/__user_pattern.texconf`
     ,conf = {}
 const 
     { exec } = require("child_process")
@@ -18,26 +19,30 @@ const
             files.forEach( 
                 async (file) => {
                     let newbase = path.join(base,file)
-                    if ( fs.statSync(newbase).isDirectory() )
-                    {
-                        result = await mediaList(newbase,ext,fs.readdirSync(newbase),result)
-                    }
-                    else
-                    {
-                        if(!Array.isArray(ext)){
-                            if ( file.substr(-1*(ext.length+1)) == '.' + ext )
-                            {
-                                result.push(newbase)
-                            }
+                    try{
+                        if ( fs.statSync(newbase).isDirectory() )
+                        {
+                            result = await mediaList(newbase,ext,fs.readdirSync(newbase),result)
                         }
-                        else ext.forEach(
-                            xt=>{
-                                if ( (file.substr(-1*(xt.length+1)) === '.'+xt) )
+                        else
+                        {
+                            if(!Array.isArray(ext)){
+                                if ( file.substr(-1*(ext.length+1)) == '.' + ext )
                                 {
                                     result.push(newbase)
-                                }   
+                                }
                             }
-                        ) 
+                            else ext.forEach(
+                                xt=>{
+                                    if ( (file.substr(-1*(xt.length+1)) === '.'+xt) )
+                                    {
+                                        result.push(newbase)
+                                    }   
+                                }
+                            ) 
+                        }
+                    }catch(e){
+                       console.log('') 
                     }
                 }
             )
@@ -57,10 +62,10 @@ const
         return await (
             async (console,dir)=>{
                 try{
-                    let list = await mediaList(`${user.homedir}/${dir}`,['mp3','mp4','avi']) 
+                    let list = await mediaList(`${user.homedir}/${dir}`,['mp3','mp4']) 
                     return list
                 }catch(e){
-                    console.log("asas"+e)
+                    console.log("-::[[ errs ]]::-"+e)
                 }
 
             }
@@ -147,6 +152,58 @@ app.socket.on(
     }
 )
 app.socket.on(
+    'play opened media',
+    (s,{name,media})=>{
+        console.log('fa deh pourtant..')
+        ffprobe(
+            media
+            ).then(
+                infos=>{
+                    if((infos.format.size/1024)/1000 >= 650){
+                        data = fs.createReadStream(media)
+                        s.reply(
+                            'lmedia stream reception start'
+                            ,infos.format.size
+                        )
+                        data.on(
+                            'data',
+                            buff=>{
+                                s.reply(
+                                    'lmedia stream reception',
+                                    buff
+                                )
+                            }
+                        )
+                        data.on(
+                            'end',
+                            ()=>s.reply(
+                                'lmedia stream reception end',
+                                {d:"",name,fn:media,infos}
+                            )
+                        )
+                    }else{
+                        data = fs.readFileSync(media)
+                        s.reply(
+                            'play media',
+                            {data,name,fn:media,infos}
+                        )
+                    }
+            }
+
+            
+        
+        ).catch(
+        
+            infos=>s.reply(
+                'play media',
+                {data,name,fn:media,infos}
+            )
+
+        
+        )
+    }
+)
+app.socket.on(
     'play media',
     (s,fn)=>{
         let medias = conf.users[user.username].medias
@@ -156,16 +213,41 @@ app.socket.on(
                     let splitted = media.split('/')
                     ,name = splitted[splitted.length-1]
                     if (name === fn) {
-                        data = fs.readFileSync(media)
                         
                         ffprobe(
                             media
-                        ).then(
-                            
-                            infos=>s.reply(
-                                'play media',
-                                {data,name,fn:media,infos}
-                            )
+                            ).then(
+                                infos=>{
+                                    if((infos.format.size/1024)/1000 >= 650){
+                                        data = fs.createReadStream(media)
+                                        s.reply(
+                                            'lmedia stream reception start'
+                                            ,infos.format.size
+                                        )
+                                        data.on(
+                                            'data',
+                                            buff=>{
+                                                s.reply(
+                                                    'lmedia stream reception',
+                                                    buff
+                                                )
+                                            }
+                                        )
+                                        data.on(
+                                            'end',
+                                            ()=>s.reply(
+                                                'lmedia stream reception end',
+                                                {d:"",name,fn:media,infos}
+                                            )
+                                        )
+                                    }else{
+                                        data = fs.readFileSync(media)
+                                        s.reply(
+                                            'play media',
+                                            {data,name,fn:media,infos}
+                                        )
+                                    }
+                            }
     
                             
                         

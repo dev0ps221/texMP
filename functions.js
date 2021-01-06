@@ -1,6 +1,6 @@
 let { BrowserWindow, app,screen,ipcMain } = require ("electron")
 let fs = require('fs')
-let md5 = require("./scripts/md5.js")
+let md5 = require(`${process.mainModule.path}/scripts/md5.js`)
 let win = false
 let createWindow = ()=>{
     let browserArgs = {
